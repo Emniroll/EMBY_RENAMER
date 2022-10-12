@@ -45,6 +45,12 @@ class Renamer:
     def __init__(self):
         pass
 
+    def check_regular(self, video_list):
+        video_list.sort()
+        result = all([re.search('.*{}.*'.format(str(index + 1)), video_name) is not None for index, video_name in
+                      enumerate(video_list)])
+        return result
+
     def season_rename(self, path, season_num):
         # 查找所有视频
         video_list = []
@@ -53,16 +59,17 @@ class Renamer:
             if videos:
                 video_list.extend(list(videos))
         video_list.sort()
-        print(video_list)
         # 判断是否是名称中是否只有序号发生变化
-        regular_flag = all([re.search('.*{}.*'.format(str(index + 1)), video_name) is not None for index, video_name in
-                            enumerate(video_list)])
+        regular_flag = self.check_regular(video_list)
         if regular_flag:
-            print("in")
             self.video_rename(video_list, season_num)
             return True
         else:
             return False
+
+    # 删除op ed
+    def remove_song(self, path):
+        pass
 
     # 给确认只有正片的视频和同名字幕重命名
     def video_rename(self, video_list, season_num):
@@ -77,7 +84,7 @@ class Renamer:
             same_names = []
             for file in all_files:
                 if base_name in file:
-                    same_names.append(os.path.join(video_root,file))
+                    same_names.append(os.path.join(video_root, file))
             single_ass_flag = (len(same_names) <= 2)
             for same_name in same_names:
                 extension = same_name.split(".")[-1]
